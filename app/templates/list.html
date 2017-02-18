@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+
+    li:nth-child(odd) {
+        background-color: #f8f8f8;
+    }
+
+    li {
+        list-style: none;
+        cursor: pointer;
+        position: relative;
+        padding: 12px 8px 12px 40px;
+        background-color: #e5e5e5;
+        font-size: 18px;
+        transition: 0.2s;
+        display: list-item;
+        text-align: -webkit-match-parent;
+    }
+
+    li .close {
+        position: absolute;
+        right: 0;
+        top: 0;
+        padding: 12px 16px;
+        clear: both;
+    }
+
+    input {
+        -webkit-appearance: textfield;
+        background-color: white;
+        -webkit-rtl-ordering: logical;
+        user-select: text;
+        cursor: auto;
+        padding: 1px;
+        border-width: 2px;
+        border-style: inset;
+        border-color: initial;
+        border-image: initial;
+    }
+
+    input, button {
+        text-rendering: auto;
+        color: initial;
+        letter-spacing: normal;
+        word-spacing: normal;
+        text-transform: none;
+        text-indent: 0px;
+        text-shadow: none;
+        display: inline-block;
+        text-align: start;
+        margin: 0em 0em 0em 0em;
+        font: 13.3333px Arial;
+    }
+
+    .status-1 {
+        text-decoration: line-through;
+    }
+
+    #type-area {
+        margin: 0 auto;
+        height: 40px;
+    }
+
+    #type-area input, button {
+        line-height: 20px;
+        font-size: 20px;
+        vertical-align: top;
+    }
+
+    #type-area input {
+        margin-left: 1%;
+        width: 79%;
+    }
+
+    #type-area button {
+        width: 19%;
+        color: white;
+        height: 30px;
+        border: none;
+        background: lightblue;
+        padding: 0;
+        text-align: center;
+    }
+
+    p {
+        padding: 0;
+        margin: 0;
+    }
+
+
+</style>
+<div id="type-area">
+    <input type="text" name="content" id="toDo-input"><button id="addBtn" onclick="fresh(1);">Add</button>
+</div>
+<p onload="fresh(0);">
+    <span id="txt"></span>
+</p>
+
+
+<script type=text/javascript src="{{url_for('static', filename='jquery.js') }}"></script>
+<script>window.jQuery || document.write('<script src="{{url_for('static', filename = 'jquery.js')}}">\x3C/script>')</script>
+<script type="text/javascript">
+    var $SCRIPT_ROOT = {{request.script_root | tojson | safe}};
+    var timer, flag = 0, ct = " ", stat = 0, type = -1, id;
+    function ajaxForm(type, ct, id, stat) {
+        $.ajax({
+            type: "POST",
+            url: $SCRIPT_ROOT,
+            dataType: "json",
+            data: {
+                'type': type,
+                'content': ct,
+                'id': id,
+                'status': stat
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown, data) {
+                alert('Connection Lost!');
+                //alert(XMLHttpRequest.status + '..........' + XMLHttpRequest.readyState + '..........' + textStatus);
+            },
+            success: function (data, textStatus, response) {
+                list = document.getElementById('txt');
+                input = document.getElementById('toDo-input');
+                list.innerHTML = "";
+                //alert(JSON.stringify((data.content)[1].content)+(data.content).length);
+                var li = {}, close = {};
+                for (i = 0; i < (data.todos).length; i++) {
+                    //alert((data.content)[i].content);
+                    //str += (data.todos)[i].content + '<br>';
+                    li[i] = document.createElement("li");
+                    li[i].id = (data.todos)[i].id;
+                    li[i].className = 'toDo-item status-' + (data.todos)[i].status;
+                    var t = document.createTextNode((data.todos)[i].content);
+                    li[i].appendChild(t);
+                    close[i] = document.createElement("span");
+                    close[i].className = 'close';
+                    close[i].id = (data.todos)[i].id;
+                    close[i].innerHTML = '&times';
+                    close[i].addEventListener('click', function () {
+                        ajaxForm(-1, " ", this.id, 0);
+                    });
+                    li[i].appendChild(close[i]);
+                    li[i].addEventListener('click', function () {
+                        ajaxForm(2, " ", this.id, this.className.split('-')[this.className.split('-').length - 1]);
+                    });
+                    list.appendChild(li[i]);
+                }
+                /*
+                 $("#txt").html(str);
+                 if (ct != " ")
+                 $("#toDo-input").val("");
+                 */
+            }
+        });
+    }
+    function fresh(flag) {
+        clearInterval(timer);
+        if (flag == 1) {
+            type = 1;
+            ct = $("input[name=content]").val();
+            stat = 0;
+            document.getElementById("toDo-input").value = "";
+        }
+        else {
+            type = 0;
+            ct = " ";
+            stat = 0;
+        }
+        ajaxForm(type, ct, id, stat);
+        timer = setInterval('fresh(0);', 60000);
+    }
+    fresh(0);
+</script>
+
+{% endblock %}

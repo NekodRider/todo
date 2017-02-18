@@ -1,0 +1,26 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    form p {
+        margin: 10px;
+    }
+</style>
+<h1>Register</h1>
+<form method="get" action="" name="Register">
+    <p>
+        USER_ID :
+        <input type="text" name="id"/>
+    </p>
+    <p>
+        USERNAME:
+        <input type="text" name="name"/>
+    </p>
+    <p>
+        PASSWORD:
+        <input type="text" name="pw"/>
+    </p>
+    <p><input type="submit" value="Register"></p>
+</form>
+{% endblock %}

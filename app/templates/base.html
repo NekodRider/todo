@@ -1,0 +1,52 @@
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<html>
+<head>
+    {% if title %}
+    <title>{{title}} - To Do List</title>
+    {% else %}
+    <title>To Do List</title>
+    {% endif %}
+    <style>
+        body {
+            margin: 0;
+        }
+
+        #header {
+            display: inline-block;
+            padding: 5px 5px;
+        }
+
+        hr {
+            margin-top: 0;
+        }
+
+        h1 {
+            margin: 0;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+<div id="header">To Do List: <a href="/index">Home</a>
+    {% if user.name=='' %}
+    <a href="/login">Login</a>
+    <a href="/register">Register</a>
+    {% endif %}
+    {% if user.name!='' %}
+    <a href="/logout">Logout</a>
+    <a href="/list">List</a>
+    {% endif %}
+</div>
+<hr>
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<ul>
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+{% block content %}{% endblock %}
+</body>
+</html>
